@@ -154,20 +154,22 @@ gulp.task('default', ['clean'], function () {
 ```
 - 创建gulp配置文件夹
 - gulp执行任务顺序
-> ├── clean                                 // 执行之前先清空之前打包后的文件
-> └── build                                 // 打包任务
->   ├── html                                // html打包
->   │   ├── inject
->   │   │   ├── scripts
->   │   │   ├── styles
->   │   │   ├── injectAuth
->   │   │   │   └── stylesAuth
->   │   │   ├── inject404
->   │   │   │   └── styles404
->   │   │   └── copyVendorImages
->   │   └── partials
->   ├── fonts                              // 字体打包    
->   └── other                              // 其他文件打包，如图片
->       └── copyVendorImages
+```
+├── clean                                 // 执行之前先清空之前打包后的文件
+└── build                                 // 打包任务
+  ├── html                                // html打包
+  │   ├── inject
+  │   │   ├── scripts
+  │   │   ├── styles
+  │   │   ├── injectAuth
+  │   │   │   └── stylesAuth
+  │   │   ├── inject404
+  │   │   │   └── styles404
+  │   │   └── copyVendorImages
+  │   └── partials
+  ├── fonts                              // 字体打包    
+  └── other                              // 其他文件打包，如图片
+      └── copyVendorImages
+```
 
 
