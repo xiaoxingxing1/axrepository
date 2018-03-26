@@ -1,7 +1,6 @@
 {
   "name": "axrepository",
   "version": "1.0.0",
-  "main": "index.js",
   "repository": "https://github.com/xiaoxingxing1/axrepository.git",
   "author": "沈心怡 <shenxinyi@luopan88.com>",
   "license": "MIT",

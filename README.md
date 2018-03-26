@@ -133,4 +133,41 @@ proxy.json
 db.js
 db.json
 ```
+#### 4. gulp配置
+- 新建gulpfile.js文件
+```
+//一个公用的gulpfile.js，用Node.js内置的文件系统模块fs读取文件，动态require进去，读取各个子项目配置或gulp task，然后根据自己的需求去执行任务
+'use strict';
+
+var fs = require('fs');
+var gulp = require('gulp');
+
+fs.readdirSync('./gulp').filter(function(file) {
+  return (/\.(js|coffee)$/i).test(file);
+}).map(function(file) {
+  require('./gulp/' + file);
+});
+
+gulp.task('default', ['clean'], function () {
+  gulp.start('build');
+});
+```
+- 创建gulp配置文件夹
+- gulp执行任务顺序
+> ├── clean                                 // 执行之前先清空之前打包后的文件
+> └── build                                 // 打包任务
+>   ├── html                                // html打包
+>   │   ├── inject
+>   │   │   ├── scripts
+>   │   │   ├── styles
+>   │   │   ├── injectAuth
+>   │   │   │   └── stylesAuth
+>   │   │   ├── inject404
+>   │   │   │   └── styles404
+>   │   │   └── copyVendorImages
+>   │   └── partials
+>   ├── fonts                              // 字体打包    
+>   └── other                              // 其他文件打包，如图片
+>       └── copyVendorImages
+
 
