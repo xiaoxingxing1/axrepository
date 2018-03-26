@@ -82,7 +82,7 @@ vi .bowerrc
 - bower install
 
 ### 各种配置
-#### editorconfig——统一代码格式
+#### 1. editorconfig配置
 vi .editorconfig
 ```
 # http://editorconfig.org
@@ -98,5 +98,26 @@ insert_final_newline = true  //设为true表示使文件以一个空白行结尾
 
 [*.md]
 trim_trailing_whitespace = false
+```
+#### 2. eslintrc配置
+vi .eslintrc
+```
+{
+  //启用推荐的规则
+  "extends": "eslint:recommended",
+  //一个环境定义了一组预定义的全局变量
+  "env": {
+    "browser": true,
+    "jasmine": true
+  },
+  //配置全局变量，将变量设置为 true 将允许变量被重写，或 false 将不允许被重写
+  "globals": {
+    "angular": true,
+    "module": true,
+    "inject": true,
+    "$": true,
+    "moment": true
+  }
+}
 ```
 
