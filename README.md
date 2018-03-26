@@ -120,4 +120,17 @@ vi .eslintrc
   }
 }
 ```
+#### 3. gitignore配置
+vi .gitignore
+```
+node_modules/
+bower_components/
+.tmp/
+dist/
+dist.zip
+proxy.json
+.vscode
+db.js
+db.json
+```
 
