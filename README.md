@@ -75,8 +75,28 @@ vi .bowerrc
 - bower install font-awesome --save (图标字体库和css框架)
 - bower install moment --save (一个JavaScript日期处理类库)
 - bower install angular-loading-bar --save (AngularJS的自动加载条)
-- bower install sass-flex-mixin --save (解决 flexbox版本兼容)
+- bower install sass-flex-mixin --save (解决flexbox版本兼容)
 
 ### 安装依赖包
 - yarn 
 - bower install
+
+### 各种配置
+#### editorconfig——统一代码格式
+vi .editorconfig
+```
+# http://editorconfig.org
+root = true  //表示是最顶层的配置文件，发现设为true时，才会停止查找.editorconfig文件
+
+[*]
+indent_style = space  //设置缩进风格(tab是硬缩进，space为软缩进)
+indent_size = 2  //用一个整数定义的列数来设置缩进的宽度，如果indent_style为tab，则此属性默认为tab_width
+end_of_line = lf  //设置换行符，值为lf、cr和crlf
+charset = utf-8  //设置编码，值为latin1、utf-8、utf-8-bom、utf-16be和utf-16le，不建议使用utf-8-bom
+trim_trailing_whitespace = true  //设为true表示会去除换行行首的任意空白字符
+insert_final_newline = true  //设为true表示使文件以一个空白行结尾
+
+[*.md]
+trim_trailing_whitespace = false
+```
+
