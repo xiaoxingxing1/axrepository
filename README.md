@@ -163,13 +163,144 @@ gulp.task('default', ['clean'], function () {
   │   │   ├── styles
   │   │   ├── injectAuth
   │   │   │   └── stylesAuth
-  │   │   ├── inject404
-  │   │   │   └── styles404
   │   │   └── copyVendorImages
   │   └── partials
   ├── fonts                              // 字体打包    
   └── other                              // 其他文件打包，如图片
       └── copyVendorImages
 ```
+- 新建conf.js文件
+```
+var gutil = require('gulp-util');
+
+exports.paths = {
+  src: 'src',
+  dist: 'dist',
+  tmp: '.tmp',
+  e2e: 'e2e'
+};
+
+exports.wiredep = {
+  exclude: [/\/bootstrap\.js$/, /\/bootstrap-sass\/.*\.js/, /\/bootstrap\.css/],
+  directory: 'bower_components'
+};
+
+exports.errorHandler = function(title) {
+  'use strict';
+
+  return function(err) {
+    gutil.log(gutil.colors.red('[' + title + ']'), err.toString());
+    this.emit('end');
+  };
+};
+```
+- 新建build.js文件
+> 先引入需要的东西
+```
+var path = require('path');
+var gulp = require('gulp');
+var conf = require('./conf');
+```
+> 分任务解析如下
+##### clean任务
+> 使用del方法清空该路径下的文件或文件夹
+```
+gulp.task('clean', function () {
+  return $.del([path.join(conf.paths.dist, '/'), path.join(conf.paths.tmp, '/')]);
+});
+```
+##### build任务
+> 完成html、字体和其他的打包
+> partials任务(作用：将所有Angular的template合并起来，最后通过angular的templateCache服务将原本的Html载入，优点是减少请求数，在app不大的时候能显著的提高加载速度)
+```
+gulp.task('partials', function () {
+  return gulp.src([
+    path.join(conf.paths.src, '/app/**/*.html'),
+    path.join(conf.paths.tmp, '/serve/app/**/*.html')
+  ])
+    .pipe($.htmlmin({
+      removeEmptyAttributes: true,
+      removeAttributeQuotes: true,
+      collapseBooleanAttributes: true,
+      collapseWhitespace: true
+    }))
+    .pipe($.angularTemplatecache('templateCacheHtml.js', {
+      module: 'axrepository',
+      root: 'app'
+    }))
+    .pipe(gulp.dest(conf.paths.tmp + '/partials/'));
+});
+```
+- html打包
+```
+gulp.task('html', ['inject', 'partials'], function () {
+  var partialsInjectFile = gulp.src(path.join(conf.paths.tmp, '/partials/templateCacheHtml.js'), { read: false });
+  var partialsInjectOptions = {
+    starttag: '<!-- inject:partials -->',
+    ignorePath: path.join(conf.paths.tmp, '/partials'),
+    addRootSlash: false
+  };
+
+  var htmlFilter = $.filter('*.html', { restore: true });
+  var jsFilter = $.filter('**/*.js', { restore: true });
+  var cssFilter = $.filter('**/*.css', { restore: true });
+
+  return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'))
+    .pipe($.inject(partialsInjectFile, partialsInjectOptions))
+    .pipe($.useref())
+    .pipe(jsFilter)
+    .pipe($.sourcemaps.init())
+    .pipe($.ngAnnotate())
+    .pipe($.rev())
+    .pipe($.sourcemaps.write('maps'))
+    .pipe(jsFilter.restore)
+    .pipe(cssFilter)
+    .pipe($.replace('../bower_components/font-awesome/fonts', '../fonts'))
+    .pipe($.cssnano())
+    .pipe($.rev())
+    .pipe(cssFilter.restore)
+    .pipe($.revReplace())
+    .pipe(htmlFilter)
+    .pipe($.htmlmin({
+      removeEmptyAttributes: true,
+      removeAttributeQuotes: true,
+      collapseBooleanAttributes: true,
+      collapseWhitespace: true
+    }))
+    .pipe(htmlFilter.restore)
+    .pipe(gulp.dest(path.join(conf.paths.dist, '/')))
+    .pipe($.size({ title: path.join(conf.paths.dist, '/'), showFiles: true }));
+  });
+```
+- 字体打包
+> 遍历文件夹找到字体文件，进行压缩打包后，放入指定文件夹内
+```
+gulp.task('fonts', function () {
+  return gulp.src($.mainBowerFiles())
+    .pipe($.filter('**/*.{eot,otf,svg,ttf,woff,woff2}'))
+    .pipe($.flatten())
+    .pipe(gulp.dest(path.join(conf.paths.dist, '/fonts/')));
+});
+```
+- 其他打包
+```
+gulp.task('other', function () {
+  var fileFilter = $.filter(function (file) {
+    return file.stat.isFile();
+  });
+
+  return gulp.src([
+    path.join(conf.paths.src, '/**/*'),
+    path.join('!' + conf.paths.src, '/**/*.{html,css,js,scss}')
+  ])
+    .pipe(fileFilter)
+    .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
+});
+```
+> 最后build
+```
+gulp.task('build', ['html', 'fonts', 'other']);
+```
+
 
 
