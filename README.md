@@ -81,6 +81,41 @@ vi .bowerrc
 - yarn 
 - bower install
 
+### 确定文件结构
+```
+├── .tmp                                 
+├── dist                                 
+└── gulp                                 
+  ├── build.js                                
+  ├── conf.js
+  ├── e2e-tests.js                                 
+  ├── inject.js                                 
+  ├── scripts.js                                 
+  ├── server.js                                 
+  ├── styles.js                                 
+  ├── unit-tests.js                                 
+  └── watch.js 
+├── e2e  
+  ├── main.po.js                                 
+  └── main.spec.js 
+├── bower_components 
+├── node_modules 
+├── src  
+  ├── app                                 
+  ├── assets 
+    ├── images                                 
+    └── styles                               
+  ├── favicon.ico                                 
+  └── index.html
+├── .bowerrc
+├── .editorconfig
+├── .eslintrc  
+├── .gitignore  
+├── bower.json  
+├── gulpfile.js  
+└── package.json 
+```
+
 ### 各种配置
 #### 1. editorconfig配置
 vi .editorconfig
@@ -195,11 +230,15 @@ exports.errorHandler = function(title) {
 };
 ```
 - 新建build.js文件
-> 先引入需要的东西
+> 先引入需要的东西，使用gulp-load-plugins只要将需要的功能方法引进来就可以调用它
 ```
 var path = require('path');
 var gulp = require('gulp');
 var conf = require('./conf');
+
+var $ = require('gulp-load-plugins')({
+  pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del']
+});
 ```
 > 分任务解析如下
 ##### clean任务
@@ -211,7 +250,8 @@ gulp.task('clean', function () {
 ```
 ##### build任务
 > 完成html、字体和其他的打包
-> partials任务(作用：将所有Angular的template合并起来，最后通过angular的templateCache服务将原本的Html载入，优点是减少请求数，在app不大的时候能显著的提高加载速度)
+
+> partials任务(作用：将所有Angular的template合并起来，最后通过angular的templateCache服务将原本的html载入，优点是减少请求数，在app不大的时候能显著的提高加载速度)
 ```
 gulp.task('partials', function () {
   return gulp.src([
@@ -247,19 +287,24 @@ gulp.task('html', ['inject', 'partials'], function () {
 
   return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'))
     .pipe($.inject(partialsInjectFile, partialsInjectOptions))
-    .pipe($.useref())
-    .pipe(jsFilter)
+    .pipe($.useref())  //将多个文件拼接成单一文件，并输出到相应目录
+
+    .pipe(jsFilter)   
     .pipe($.sourcemaps.init())
     .pipe($.ngAnnotate())
     .pipe($.rev())
     .pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
+
+    //压缩css
     .pipe(cssFilter)
     .pipe($.replace('../bower_components/font-awesome/fonts', '../fonts'))
     .pipe($.cssnano())
     .pipe($.rev())
     .pipe(cssFilter.restore)
+    
     .pipe($.revReplace())
+
     .pipe(htmlFilter)
     .pipe($.htmlmin({
       removeEmptyAttributes: true,
@@ -268,6 +313,7 @@ gulp.task('html', ['inject', 'partials'], function () {
       collapseWhitespace: true
     }))
     .pipe(htmlFilter.restore)
+
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')))
     .pipe($.size({ title: path.join(conf.paths.dist, '/'), showFiles: true }));
   });
@@ -300,6 +346,263 @@ gulp.task('other', function () {
 > 最后build
 ```
 gulp.task('build', ['html', 'fonts', 'other']);
+```
+- 新建watch.js文件
+```
+'use strict';
+
+var path = require('path');
+var gulp = require('gulp');
+var conf = require('./conf');
+
+var browserSync = require('browser-sync');
+
+function isOnlyChange(event) {
+  return event.type === 'changed';
+}
+
+gulp.task('watch', ['inject'], function () {
+
+  gulp.watch([path.join(conf.paths.src, '/*.html'), 'bower.json'], ['inject-reload']);
+
+  gulp.watch([
+    path.join(conf.paths.src, '/app/**/*.css'),
+    path.join(conf.paths.src, '/app/**/*.scss')
+  ], function(event) {
+    if(isOnlyChange(event)) {
+      gulp.start('styles-reload');
+    } else {
+      gulp.start('inject-reload');
+    }
+  });
+
+  gulp.watch(path.join(conf.paths.src, '/app/**/*.js'), function(event) {
+    if(isOnlyChange(event)) {
+      gulp.start('scripts-reload');
+    } else {
+      gulp.start('inject-reload');
+    }
+  });
+
+  gulp.watch(path.join(conf.paths.src, '/app/**/*.html'), function(event) {
+    browserSync.reload(event.path);
+  });
+});
+```
+- 新建inject.js文件
+```
+'use strict';
+
+var path = require('path');
+var gulp = require('gulp');
+var conf = require('./conf');
+
+var $ = require('gulp-load-plugins')();
+
+var wiredep = require('wiredep').stream;
+var _ = require('lodash');
+
+var browserSync = require('browser-sync');
+
+gulp.task('inject-reload', ['inject'], function() {
+  browserSync.reload();
+});
+
+gulp.task('inject', ['scripts', 'styles'], function () {
+  var injectStyles = gulp.src([
+    path.join(conf.paths.tmp, '/serve/app/**/*.css'),
+    path.join('!' + conf.paths.tmp, '/serve/app/vendor.css')
+  ], { read: false });
+
+  var injectScripts = gulp.src([
+    path.join(conf.paths.src, '/app/**/*.module.js'),
+    path.join(conf.paths.src, '/app/**/*.js'),
+    path.join('!' + conf.paths.src, '/app/**/*.spec.js'),
+    path.join('!' + conf.paths.src, '/app/**/*.mock.js'),
+  ])
+  .pipe($.angularFilesort()).on('error', conf.errorHandler('AngularFilesort'));
+
+  var injectOptions = {
+    ignorePath: [conf.paths.src, path.join(conf.paths.tmp, '/serve')],
+    addRootSlash: false
+  };
+
+  return gulp.src(path.join(conf.paths.src, '/*.html'))
+    .pipe($.inject(injectStyles, injectOptions))
+    .pipe($.inject(injectScripts, injectOptions))
+    .pipe(wiredep(_.extend({}, conf.wiredep)))
+    .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve')));
+});
+```
+- 新建scripts.js文件
+```
+'use strict';
+
+var path = require('path');
+var gulp = require('gulp');
+var conf = require('./conf');
+
+var browserSync = require('browser-sync');
+
+var $ = require('gulp-load-plugins')();
+
+
+gulp.task('scripts-reload', function() {
+  return buildScripts()
+    .pipe(browserSync.stream());
+});
+
+gulp.task('scripts', function() {
+  return buildScripts();
+});
+
+function buildScripts() {
+  return gulp.src(path.join(conf.paths.src, '/app/**/*.js'))
+    .pipe($.eslint())
+    .pipe($.eslint.format())
+    .pipe($.size())
+}
+```
+- 新建server.js文件
+```
+'use strict';
+
+var path = require('path');
+var gulp = require('gulp');
+var conf = require('./conf');
+
+var browserSync = require('browser-sync');
+var browserSyncSpa = require('browser-sync-spa');
+
+var util = require('util');
+
+var proxyMiddleware = require('http-proxy-middleware');
+
+function browserSyncInit(baseDir, browser) {
+  browser = browser === undefined ? 'default' : browser;
+
+  var routes = null;
+  if(baseDir === conf.paths.src || (util.isArray(baseDir) && baseDir.indexOf(conf.paths.src) !== -1)) {
+    routes = {
+      '/bower_components': 'bower_components'
+    };
+  }
+
+  var server = {
+    baseDir: baseDir,
+    routes: routes
+  };
+
+  // 设置代理
+  var fs = require('fs');
+  var path = require('path');
+  var proxy_file = path.join(__dirname, '..', 'proxy.json');
+  var exist = fs.statSync(proxy_file);
+  if (exist) {
+    var proxy_conf = require(proxy_file);
+    server.middleware = Object.keys(proxy_conf).map(function(key) {
+      return proxyMiddleware(key, proxy_conf[key]);
+    });
+  }
+
+  /*
+   * You can add a proxy to your backend by uncommenting the line below.
+   * You just have to configure a context which will we redirected and the target url.
+   * Example: $http.get('/users') requests will be automatically proxified.
+   *
+   * For more details and option, https://github.com/chimurai/http-proxy-middleware/blob/v0.9.0/README.md
+   */
+  // server.middleware = proxyMiddleware('/api', {
+  //   "pathRewrite": {
+  //     "/api": "/travel_cs_web"
+  //   },
+  //   "target": "http://180.97.80.177:8095"
+  // });
+
+  browserSync.instance = browserSync.init({
+    startPath: '/',
+    server: server,
+    browser: browser
+  });
+}
+
+browserSync.use(browserSyncSpa({
+  selector: '[ng-app]'// Only needed for angular apps
+}));
+
+gulp.task('serve', ['watch'], function () {
+  browserSyncInit([path.join(conf.paths.tmp, '/serve'), conf.paths.src]);
+});
+
+gulp.task('serve:dist', ['build'], function () {
+  browserSyncInit(conf.paths.dist);
+});
+
+gulp.task('serve:e2e', ['inject'], function () {
+  browserSyncInit([conf.paths.tmp + '/serve', conf.paths.src], []);
+});
+
+gulp.task('serve:e2e-dist', ['build'], function () {
+  browserSyncInit(conf.paths.dist, []);
+});
+```
+- 新建styles.js文件
+```
+'use strict';
+
+var path = require('path');
+var gulp = require('gulp');
+var conf = require('./conf');
+
+var browserSync = require('browser-sync');
+
+var $ = require('gulp-load-plugins')();
+
+var wiredep = require('wiredep').stream;
+var _ = require('lodash');
+
+gulp.task('styles-reload', ['styles'], function() {
+  return buildStyles()
+    .pipe(browserSync.stream());
+});
+
+gulp.task('styles', function() {
+  return buildStyles();
+});
+
+var buildStyles = function() {
+  var sassOptions = {
+    outputStyle: 'expanded',
+    precision: 10
+  };
+
+  var injectFiles = gulp.src([
+    path.join(conf.paths.src, '/app/**/*.scss'),
+    path.join('!' + conf.paths.src, '/app/index.scss')
+  ], { read: false });
+
+  var injectOptions = {
+    transform: function(filePath) {
+      filePath = filePath.replace(conf.paths.src + '/app/', '');
+      return '@import "' + filePath + '";';
+    },
+    starttag: '// injector',
+    endtag: '// endinjector',
+    addRootSlash: false
+  };
+
+
+  return gulp.src([
+    path.join(conf.paths.src, '/app/index.scss')
+  ])
+    .pipe($.inject(injectFiles, injectOptions))
+    .pipe(wiredep(_.extend({}, conf.wiredep)))
+    .pipe($.sourcemaps.init())
+    .pipe($.sass(sassOptions)).on('error', conf.errorHandler('Sass'))
+    .pipe($.autoprefixer()).on('error', conf.errorHandler('Autoprefixer'))
+    .pipe($.sourcemaps.write())
+    .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app/')));
+};
 ```
 
 
