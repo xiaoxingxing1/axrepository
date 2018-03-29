@@ -95,14 +95,14 @@ vi .bowerrc
   ├── styles.js                                 
   ├── unit-tests.js                                 
   └── watch.js 
-├── e2e  
+└── e2e  
   ├── main.po.js                                 
   └── main.spec.js 
 ├── bower_components 
 ├── node_modules 
-├── src  
+└── src  
   ├── app                                 
-  ├── assets 
+  └── assets 
     ├── images                                 
     └── styles                               
   ├── favicon.ico                                 

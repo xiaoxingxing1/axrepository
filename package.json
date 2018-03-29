@@ -4,6 +4,11 @@
   "repository": "https://github.com/xiaoxingxing1/axrepository.git",
   "author": "沈心怡 <shenxinyi@luopan88.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "gulp test",
+    "start": "gulp serve",
+    "build": "rm -rf dist && gulp build"
+  },
   "dependencies": {
     "browser-sync": "^2.23.6",
     "browser-sync-spa": "^1.0.3",
