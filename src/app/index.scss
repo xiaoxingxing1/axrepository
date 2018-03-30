@@ -1,0 +1,99 @@
+@import "../assets/styles/_variables.scss";
+
+$icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
+// fontawesome
+$fa-font-path: "../../bower_components/font-awesome/fonts";
+@import "../../bower_components/font-awesome/scss/font-awesome.scss";
+
+// 覆盖bootstrap变量
+$font-size-base: 12px;
+
+article, aside, blockquote, body, button, dd, details, div, dl, dt, fieldset, figcaption, figure, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, hr, input, legend, li, menu, nav, ol, p, section, td, textarea, th, ul {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+[ui-view=login] {
+  text-align: center;
+  .login {
+    color: #CE5454;
+  }
+}
+
+[ui-view=main] {
+  .publicPart {
+    width: 100%;
+    height: 200px;
+    line-height: 200px;
+    text-align: center;
+    background: #c00;
+    color: #FFF;
+  }
+}
+
+// 表格去除margin-bottom
+.table {
+  margin-bottom: 0 !important;
+}
+
+// 表单必填标识
+span.required {
+  color: #c00;
+  margin-right: 4px;
+}
+// 修复表单下radio checkbox 水平未对齐的问题
+form input[type="radio"], input[type="checkbox"] {
+  margin: 2px 0;
+}
+
+// 表单错误提示
+.has-error .ng-active {
+  float: left;
+  margin: 2px 0 0 20px;
+  padding: 3px 10px;
+  color: #FFF;
+  border-radius: 3px 4px 4px 3px;
+  background-color: #CE5454;
+  max-width: 200px;
+  // white-space: pre;
+  position: relative;
+  left: -15px;
+  opacity: 0;
+  z-index: 1;
+  transition: 0.15s ease-out
+}
+.has-error .ng-active::after {
+  content: '';
+  display: block;
+  height: 0;
+  width: 0;
+  border-color: transparent #CE5454 transparent transparent;
+  border-style: solid;
+  border-width: 11px 7px;
+  position: absolute;
+  left: -13px;
+  top: 1px
+}
+.has-error .ng-active {
+  left: 0;
+  opacity: 1
+}
+
+/**
+ *  Do not remove the comments below. It's the markers used by wiredep to inject
+ *  sass dependencies when defined in the bower.json of your dependencies
+ */
+// bower:scss
+// endbower
+
+/**
+ *  Do not remove the comments below. It's the markers used by gulp-inject to inject
+ *  all your sass files automatically
+ */
+// injector
+// endinjector
