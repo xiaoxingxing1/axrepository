@@ -5,11 +5,10 @@
     .module('axrepository')
     .controller('LoginController', LoginController);
 
-  function LoginController($scope, localStorageService, $state, $rootScope) {
+  function LoginController($scope, localStorageService, $state) {
     activate();
 
     function activate() {
-      $rootScope.logined = true;
       $scope.user = {
         account: '',
         password: ''
@@ -22,7 +21,7 @@
      */
     function login(){
       if ($scope.user.account=='1'&&$scope.user.password=='1') {
-        localStorageService.set('token', 'cjlwhefiqoiwqwjnxbajshdqwuu17276312ghagh');
+        $state.go('main.page-list');
       } else {
         alert('账号与密码不匹配！');
       }

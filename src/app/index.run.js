@@ -6,16 +6,12 @@
     .run(runBlock);
 
   /** @ngInject */
-  function runBlock($rootScope, localStorageService, $state, $window) {
+  function runBlock($rootScope, localStorageService, $state, $window, $location) {
     moment.locale('zh-cn');
-    // 初始化时，判断登录状态
-    $rootScope.logined = true;
-    // $rootScope.logined = !!localStorageService.get('token');
-    // $rootScope.mainPage = !!localStorageService.get('token');
 
-    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) { // eslint-disable-line
-      $state;
-      var className = 'path-' + toState.url.replace(/\//g, '').replace(/:/g, '-').replace(/-0/g, '');
+    $rootScope.$on('$locationChangeSuccess', function() {
+      var className = 'path-' + $location.path().slice(1).split("/")[0]+'-id';
+      console.log(className);
       $('#root')
         .removeClass()
         .addClass(className.split('?')[0]);

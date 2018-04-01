@@ -1,11 +1,18 @@
 .path-page {
-  .pagelist {
-    color: aquamarine;
+  text-align: center;
+  ul {
+    list-style: none;
+    margin-top: 30px;
+    li {
+      margin-bottom: 10px;
+    }
   }
 }
 
 .path-page-id {
-  .pagedetail {
-    color: bisque;
+  text-align: center;
+  p {
+    margin-top: 30px;
+    color: green;
   }
 }

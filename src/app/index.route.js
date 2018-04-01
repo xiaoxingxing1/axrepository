@@ -42,9 +42,9 @@
         }
       })
 
-    $urlRouterProvider.otherwise('/');
-
-    $locationProvider.html5Mode(true);
+      $urlRouterProvider.otherwise('/login');
+      //AngularJS去掉URL里的#号
+      $locationProvider.html5Mode(true);
   }
 
 })();
