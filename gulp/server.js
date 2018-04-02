@@ -45,12 +45,6 @@ function browserSyncInit(baseDir, browser) {
    *
    * For more details and option, https://github.com/chimurai/http-proxy-middleware/blob/v0.9.0/README.md
    */
-  // server.middleware = proxyMiddleware('/api', {
-  //   "pathRewrite": {
-  //     "/api": "/travel_cs_web"
-  //   },
-  //   "target": "http://180.97.80.177:8095"
-  // });
 
   browserSync.instance = browserSync.init({
     startPath: '/',

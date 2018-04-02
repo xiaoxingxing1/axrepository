@@ -7,7 +7,9 @@
   "scripts": {
     "test": "gulp test",
     "start": "gulp serve",
-    "build": "rm -rf dist && gulp build"
+    "lint": "eslint src/**/*.js",
+    "build": "rm -rf dist && gulp build",
+    "deploy": "rsync -azP --delete-after dist/* root@47.98.53.220:/home/www/htdocs/axrepository"
   },
   "dependencies": {
     "browser-sync": "^2.23.6",

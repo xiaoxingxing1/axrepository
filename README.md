@@ -170,23 +170,7 @@ db.json
 ```
 #### 4. gulp配置
 - 新建gulpfile.js文件
-```
-//一个公用的gulpfile.js，用Node.js内置的文件系统模块fs读取文件，动态require进去，读取各个子项目配置或gulp task，然后根据自己的需求去执行任务
-'use strict';
-
-var fs = require('fs');
-var gulp = require('gulp');
-
-fs.readdirSync('./gulp').filter(function(file) {
-  return (/\.(js|coffee)$/i).test(file);
-}).map(function(file) {
-  require('./gulp/' + file);
-});
-
-gulp.task('default', ['clean'], function () {
-  gulp.start('build');
-});
-```
+> 一个公用的gulpfile.js，用Node.js内置的文件系统模块fs读取文件，动态require进去，读取各个子项目配置或gulp task，然后根据自己的需求去执行任务
 - 创建gulp配置文件夹
 - gulp执行任务顺序
 ```
@@ -205,30 +189,7 @@ gulp.task('default', ['clean'], function () {
       └── copyVendorImages
 ```
 - 新建conf.js文件
-```
-var gutil = require('gulp-util');
-
-exports.paths = {
-  src: 'src',
-  dist: 'dist',
-  tmp: '.tmp',
-  e2e: 'e2e'
-};
-
-exports.wiredep = {
-  exclude: [/\/bootstrap\.js$/, /\/bootstrap-sass\/.*\.js/, /\/bootstrap\.css/],
-  directory: 'bower_components'
-};
-
-exports.errorHandler = function(title) {
-  'use strict';
-
-  return function(err) {
-    gutil.log(gutil.colors.red('[' + title + ']'), err.toString());
-    this.emit('end');
-  };
-};
-```
+>  建立路径文件用来存放路径，之后用到只需要写路径对应的变量即可
 - 新建build.js文件
 > 先引入需要的东西，使用gulp-load-plugins只要将需要的功能方法引进来就可以调用它
 ```
@@ -348,47 +309,7 @@ gulp.task('other', function () {
 gulp.task('build', ['html', 'fonts', 'other']);
 ```
 - 新建watch.js文件
-```
-'use strict';
-
-var path = require('path');
-var gulp = require('gulp');
-var conf = require('./conf');
-
-var browserSync = require('browser-sync');
-
-function isOnlyChange(event) {
-  return event.type === 'changed';
-}
-
-gulp.task('watch', ['inject'], function () {
-
-  gulp.watch([path.join(conf.paths.src, '/*.html'), 'bower.json'], ['inject-reload']);
-
-  gulp.watch([
-    path.join(conf.paths.src, '/app/**/*.css'),
-    path.join(conf.paths.src, '/app/**/*.scss')
-  ], function(event) {
-    if(isOnlyChange(event)) {
-      gulp.start('styles-reload');
-    } else {
-      gulp.start('inject-reload');
-    }
-  });
-
-  gulp.watch(path.join(conf.paths.src, '/app/**/*.js'), function(event) {
-    if(isOnlyChange(event)) {
-      gulp.start('scripts-reload');
-    } else {
-      gulp.start('inject-reload');
-    }
-  });
-
-  gulp.watch(path.join(conf.paths.src, '/app/**/*.html'), function(event) {
-    browserSync.reload(event.path);
-  });
-});
-```
+> 实时监控代码的更新变化，有变化则自动刷新页面 
 - 新建inject.js文件
 ```
 'use strict';
@@ -464,6 +385,7 @@ function buildScripts() {
 }
 ```
 - 新建server.js文件
+> serve是启动项目所用，当执行gulp serve时，会执行watch任务后打开对应路径下的静态页面
 ```
 'use strict';
 
@@ -512,12 +434,6 @@ function browserSyncInit(baseDir, browser) {
    *
    * For more details and option, https://github.com/chimurai/http-proxy-middleware/blob/v0.9.0/README.md
    */
-  // server.middleware = proxyMiddleware('/api', {
-  //   "pathRewrite": {
-  //     "/api": "/travel_cs_web"
-  //   },
-  //   "target": "http://180.97.80.177:8095"
-  // });
 
   browserSync.instance = browserSync.init({
     startPath: '/',
@@ -604,6 +520,18 @@ var buildStyles = function() {
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app/')));
 };
 ```
+### 写一个简单页面
+### 启动
+- yarn start
+### 打包
+- yarn build
+### 部署前准备
+1. 服务器端(linux)安装rsync
+- yum -y install rsync
+2. package.json中配置
+- "deploy": "rsync -azP --delete-after dist/* root@47.98.53.220:/home/www/htdocs/axrepository"
+### 部署
+- yarn deploy
 
 
 

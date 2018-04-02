@@ -10,8 +10,13 @@
     moment.locale('zh-cn');
 
     $rootScope.$on('$locationChangeSuccess', function() {
-      var className = 'path-' + $location.path().slice(1).split("/")[0]+'-id';
-      console.log(className);
+      var path = $location.path().slice(1);
+      var className;
+      if(path.indexOf('/') > 0){
+        className = 'path-' + path.split("/")[0]+'-id';
+      }else{
+        className = 'path-' + path;
+      }
       $('#root')
         .removeClass()
         .addClass(className.split('?')[0]);
