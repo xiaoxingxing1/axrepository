@@ -530,9 +530,9 @@ var buildStyles = function() {
 
 ### 部署前准备
 1. 服务器端(linux)安装rsync
-> yum -y install rsync
+`yum -y install rsync`
 2. package.json中配置
-> "deploy": "rsync -azP --delete-after dist/* root@47.98.53.220:/home/www/htdocs/axrepository"
+`"deploy": "rsync -azP --delete-after dist/* root@47.98.53.220:/home/www/htdocs/axrepository"`
 
 ### 部署
 - yarn deploy
