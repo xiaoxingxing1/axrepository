@@ -532,6 +532,7 @@ var buildStyles = function() {
 1. 服务器端(linux)安装rsync
 
 `yum -y install rsync`
+
 2. package.json中配置
 
 `"deploy": "rsync -azP --delete-after dist/* root@47.98.53.220:/home/www/htdocs/axrepository"`
