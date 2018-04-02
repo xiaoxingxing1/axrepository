@@ -521,17 +521,38 @@ var buildStyles = function() {
 };
 ```
 ### 写一个简单页面
+
 ### 启动
 - yarn start
+
 ### 打包
 - yarn build
+
 ### 部署前准备
 1. 服务器端(linux)安装rsync
-- yum -y install rsync
+> yum -y install rsync
 2. package.json中配置
-- "deploy": "rsync -azP --delete-after dist/* root@47.98.53.220:/home/www/htdocs/axrepository"
+> "deploy": "rsync -azP --delete-after dist/* root@47.98.53.220:/home/www/htdocs/axrepository"
+
 ### 部署
 - yarn deploy
+
+### 自动生成项目框架
+> 用Yeoman可以自动生成项目框架，不用走上面那么多步骤，可以在它生成的基础上修改
+#### 安装yo
+- npm install -g yo
+
+#### 安装生成器
+1. 安装依赖的gulp和bower
+- npm install -g yo gulp bower
+2. 安装生成器
+- npm install -g generator-gulp-angular
+
+#### 运行生成器
+1. 创建项目目录，并进入目录
+- mkdir new-project && cd $_
+2. 运行生成器
+- yo gulp-angular
 
 
 
