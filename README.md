@@ -348,5 +348,23 @@ gulp.task('build', ['html', 'fonts', 'other']);
 2. 运行生成器
 - yo gulp-angular
 
+#### 关于build后dist下的index.html打开空白的问题
+- 原因
+```
+Failed to load resource: net::ERR_FILE_NOT_FOUND file:///styles/vendor.css
+Failed to load resource: net::ERR_FILE_NOT_FOUND file:///styles/app.css
+Failed to load resource: net::ERR_FILE_NOT_FOUND file:///scripts/vendor.js
+Failed to load resource: net::ERR_FILE_NOT_FOUND file:///scripts/app.js
+
+这些资源的路径无法加载
+这是因为在index.html中加了<base>标记
+为什么加<base>标记，因为想要地址栏不想出现#!这样的符号，所以在route.js中加了$locationProvider.html5Mode(true)，然后就得加<base>标记
+```
+- 解决方案
+```
+把<base>标记和$locationProvider.html5Mode(true)都注释掉
+```
+
+
 
 
