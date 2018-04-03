@@ -5,5 +5,3 @@ dist/
 dist.zip
 proxy.json
 .vscode
-db.js
-db.json
