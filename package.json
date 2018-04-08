@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "test": "gulp test",
+    "preview": "gulp serve:dist",
     "start": "gulp serve",
     "lint": "eslint src/**/*.js",
     "build": "rm -rf dist && gulp build",

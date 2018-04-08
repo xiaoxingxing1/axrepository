@@ -331,24 +331,39 @@ gulp.task('build', ['html', 'fonts', 'other']);
 ### 部署
 - yarn deploy
 
-### 自动生成项目框架
+# 自动生成项目框架
 > 用Yeoman可以自动生成项目框架，不用走上面那么多步骤，可以在它生成的基础上修改
-#### 安装yo
+### 安装yo
 - npm install -g yo
 
-#### 安装生成器
+### 安装生成器
 1. 安装依赖的gulp和bower
 - npm install -g yo gulp bower
 2. 安装生成器
 - npm install -g generator-gulp-angular
 
-#### 运行生成器
+### 运行生成器
 1. 创建项目目录，并进入目录
 - mkdir new-project && cd $_
 2. 运行生成器
 - yo gulp-angular
 
-#### 关于build后dist下的index.html打开空白的问题
+# 遇到的问题
+
+### 关于$stateChangeSuccess不起作用的问题
+- 原因
+```
+ui.router >= 1.0的版本下，StateChange事件已被弃用
+```
+
+- 解决方案
+```
+用$transitions代替，如：
+$transitions.onSuccess({}, function() {
+});
+```
+
+### 关于build后dist下的index.html打开空白的问题
 - 原因
 ```
 Failed to load resource: net::ERR_FILE_NOT_FOUND file:///styles/vendor.css
