@@ -332,7 +332,7 @@ gulp.task('build', ['html', 'fonts', 'other']);
 - yarn deploy
 
 # 自动生成项目框架
-> 用Yeoman可以自动生成项目框架，不用走上面那么多步骤，可以在它生成的基础上修改
+##### 用Yeoman可以自动生成项目框架，不用走上面那么多步骤，可以在它生成的基础上修改
 ### 安装yo
 - npm install -g yo
 
